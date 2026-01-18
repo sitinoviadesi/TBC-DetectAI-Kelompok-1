@@ -1,0 +1,19 @@
+# Abaikan folder Virtual Environment
+venv/
+env/
+
+# Abaikan file Python Cache
+__pycache__/
+*.pyc
+
+# Abaikan Database Lokal (Karena berisi data user asli)
+instance/
+*.db
+users.db
+
+# Abaikan file Uploads (Kita tidak mau upload foto tes kita)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Abaikan folder VS Code settings
+.vscode/

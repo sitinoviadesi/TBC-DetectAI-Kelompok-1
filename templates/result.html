@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hasil Diagnosis - TBC Detect AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .detail-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .risk-sangat-tinggi {
+            background-color: #dc3545;
+            color: white;
+        }
+        .risk-tinggi {
+            background-color: #fd7e14;
+            color: white;
+        }
+        .risk-sedang {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .risk-rendah {
+            background-color: #28a745;
+            color: white;
+        }
+        .recommendation-box {
+            background: #e7f3ff;
+            border: 2px solid #0066cc;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .medical-notes-box {
+            background: #fff3cd;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="/dashboard" class="btn btn-outline-secondary rounded-pill px-4"><i class="fas fa-arrow-left"></i> Kembali</a>
+        <h4 class="fw-bold text-muted">Laporan Analisis #{{ nama }}</h4>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card-custom p-4 h-100 text-center d-flex flex-column justify-content-center">
+                <h5 class="text-muted mb-3">Status Diagnosis</h5>
+                
+                {% if 'NORMAL' in hasil %}
+                    <div class="status-badge bg-success text-white mb-3 mx-auto d-inline-block shadow-sm">
+                        <i class="fas fa-check-circle me-2"></i> {{ hasil }}
+                    </div>
+                {% else %}
+                    <div class="status-badge bg-danger text-white mb-3 mx-auto d-inline-block shadow-sm">
+                        <i class="fas fa-biohazard me-2"></i> {{ hasil }}
+                    </div>
+                {% endif %}
+
+                <h1 class="display-3 fw-bold text-dark my-2">{{ conf }}</h1>
+                <p class="text-muted">Tingkat Keyakinan AI</p>
+
+                <hr>
+                
+                <!-- Risk Level Display -->
+                <div class="mb-3">
+                    <p class="text-muted small">Tingkat Risiko</p>
+                    {% if 'SANGAT TINGGI' in risk_level %}
+                        <span class="risk-badge risk-sangat-tinggi">{{ risk_level }}</span>
+                    {% elif 'TINGGI' in risk_level %}
+                        <span class="risk-badge risk-tinggi">{{ risk_level }}</span>
+                    {% elif 'SEDANG' in risk_level %}
+                        <span class="risk-badge risk-sedang">{{ risk_level }}</span>
+                    {% else %}
+                        <span class="risk-badge risk-rendah">{{ risk_level }}</span>
+                    {% endif %}
+                </div>
+
+                <hr>
+                
+                <div class="d-grid gap-2 mt-auto">
+                    <a href="{{ url_for('download_pdf', filename=pdf_link) }}" class="btn btn-primary py-3 rounded-3 shadow-sm">
+                        <i class="fas fa-file-pdf me-2"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card-custom p-4 mb-4">
+                <h5 class="fw-bold mb-4"><i class="fas fa-images text-primary"></i> Visualisasi Citra Medis</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <p class="fw-bold text-center small text-muted">CITRA X-RAY ASLI</p>
+                        <img src="{{ url_for('static', filename='uploads/' + img_orig) }}" class="img-result">
+                    </div>
+                    <div class="col-md-6">
+                        <p class="fw-bold text-center small text-danger">DETEKSI HEATMAP (AI)</p>
+                        <img src="{{ url_for('static', filename='uploads/' + img_heat) }}" class="img-result border border-danger border-2">
+                    </div>
+                </div>
+                <div class="alert alert-info mt-4 border-0 bg-opacity-10 rounded-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Penjelasan:</strong> Area yang berwarna merah pada gambar kanan menunjukkan bagian paru-paru yang dicurigai oleh AI memiliki kelainan.
+                </div>
+            </div>
+
+            <!-- Medical Assessment Section -->
+            <div class="card-custom p-4 mb-4">
+                <h5 class="fw-bold mb-4"><i class="fas fa-stethoscope text-danger"></i> Penilaian Medis</h5>
+                
+                <div class="medical-notes-box">
+                    <h6 class="fw-bold mb-2"><i class="fas fa-clipboard-check"></i> Temuan Radiologis</h6>
+                    <p class="mb-0">{{ medical_notes }}</p>
+                </div>
+
+                <div class="recommendation-box">
+                    <h6 class="fw-bold mb-2"><i class="fas fa-arrow-right"></i> Rekomendasi Tindak Lanjut</h6>
+                    <p class="mb-0">{{ recommendation }}</p>
+                </div>
+            </div>
+
+            <!-- Important Notice -->
+            <div class="alert alert-warning border-2 border-warning rounded-3" role="alert">
+                <h6 class="fw-bold mb-2"><i class="fas fa-exclamation-triangle me-2"></i>PERHATIAN PENTING</h6>
+                <ul class="mb-0 small">
+                    <li>Laporan ini merupakan hasil analisis AI dan <strong>BUKAN DIAGNOSIS MEDIS FINAL</strong></li>
+                    <li>Diagnosis definitif hanya dapat diberikan oleh dokter spesialis yang berkualifikasi</li>
+                    <li>Hasil ini harus diinterpretasikan bersama dengan data klinis dan pemeriksaan fisik pasien</li>
+                    <li>Untuk kasus yang terindikasi TBC, diperlukan tes konfirmasi laboratorium (Mantoux, sputum smear, atau GeneXpert)</li>
+                    <li>Segera konsultasikan hasil ini kepada dokter atau rumah sakit terdekat untuk penanganan lebih lanjut</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

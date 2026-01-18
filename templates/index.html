@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <title>TBC Detect AI - Solusi Kesehatan AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* --- GLOBAL STYLE --- */
+        html { scroll-behavior: smooth; }
+        
+        .navbar-brand { font-weight: 700; font-size: 1.5rem; color: #2c3e50 !important; }
+        
+        /* NAVBAR ANIMATION */
+        .nav-link { position: relative; font-weight: 500; color: #555 !important; transition: color 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: #0d6efd !important; }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: #0d6efd; transition: width 0.3s ease-in-out; }
+        .nav-link:hover::after { width: 100%; }
+
+        /* HERO SECTION */
+        .hero-section { min-height: 90vh; display: flex; align-items: center; background-color: #ffffff; position: relative; overflow: hidden; padding-top: 80px; }
+        .blob-bg { position: absolute; top: -10%; right: -5%; width: 600px; height: 600px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 50%; z-index: 0; opacity: 0.6; }
+        .hero-content { position: relative; z-index: 2; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; line-height: 1.2; color: #2c3e50; margin-bottom: 20px; }
+        .hero-text { font-size: 1.1rem; color: #6c757d; margin-bottom: 30px; line-height: 1.6; }
+
+        /* BUTTONS */
+        .btn-cta-primary { background-color: #ff6b6b; color: white; padding: 12px 35px; border-radius: 50px; font-weight: 600; border: none; box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3); transition: 0.3s; }
+        .btn-cta-primary:hover { background-color: #ee5253; transform: translateY(-3px); color: white; }
+
+        /* FEATURES */
+        .feature-box { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; text-align: center; }
+        .feature-box:hover { transform: translateY(-10px); }
+        .feature-icon { width: 70px; height: 70px; background: #e3f2fd; color: #0d6efd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 20px auto; }
+        
+        /* TEAM CARD STYLE */
+        .team-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            border-top: 5px solid transparent;
+        }
+        .team-card:hover {
+            transform: translateY(-10px);
+            border-top: 5px solid #0d6efd;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .team-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            border: 5px solid #f8f9fa;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white py-3 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-lungs-virus text-primary me-2"></i>TBC Detect AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#">Beranda</a></li>
+                    <li class="nav-item ms-3"><a class="nav-link" href="#features">Fitur</a></li>
+                    <li class="nav-item ms-3"><a class="nav-link" href="#about">Tentang Kami</a></li>
+                    
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item ms-4">
+                            <span class="text-muted small me-2">Halo, {{ current_user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/dashboard" class="btn btn-primary rounded-pill px-4">
+                                <i class="fas fa-columns me-2"></i>Ke Dashboard
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item ms-4">
+                            <a href="/login" class="fw-bold text-decoration-none text-dark me-3">Masuk</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/register" class="btn btn-primary rounded-pill px-4">Daftar Sekarang</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 100px; position: absolute; z-index: 99; left: 0; right: 0;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <section class="hero-section">
+        <div class="blob-bg"></div>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2 rounded-pill">
+                        <i class="fas fa-star me-1"></i> Teknologi AI Medis Terkini
+                    </span>
+                    <h1 class="hero-title">
+                        Kesehatan Paru-Paru <br> 
+                        <span class="text-primary">Prioritas Utama Kami</span>
+                    </h1>
+                    <p class="hero-text">
+                        Deteksi dini Tuberkulosis kini lebih cepat dan akurat menggunakan kecerdasan buatan. 
+                        Bantu dokter menyelamatkan lebih banyak nyawa dengan analisis X-Ray instan.
+                    </p>
+                    <div class="d-flex gap-3">
+                        {% if current_user.is_authenticated %}
+                            <a href="/dashboard" class="btn btn-cta-primary">
+                                <i class="fas fa-microscope me-2"></i> Mulai Analisis
+                            </a>
+                        {% else %}
+                            <a href="/register" class="btn btn-cta-primary">
+                                Mulai Sekarang <i class="fas fa-arrow-right ms-2"></i>
+                            </a>
+                        {% endif %}
+                        
+                        <a href="#features" class="btn btn-outline-secondary rounded-pill px-4 py-2 d-flex align-items-center">
+                            <i class="fas fa-play-circle me-2 fa-lg"></i> Lihat Cara Kerja
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 text-center position-relative">
+                    <div class="bg-primary position-absolute top-50 start-50 translate-middle rounded-circle" 
+                         style="width: 500px; height: 500px; z-index: -1; opacity: 0.1;"></div>
+
+                    <img src="https://www.ciputramedicalcenter.com/wp-content/uploads/2020/03/making-diagnosis-team-task-doctors-looking-patient-s-x-ray_1157-48130.jpg" 
+                         alt="Dokter Analisis X-Ray" 
+                         class="img-fluid shadow-lg" 
+                         style="border-radius: 50px 0 50px 0; max-height: 450px; border: 5px solid white; object-fit: cover;">
+
+                    <div class="card position-absolute bottom-0 start-0 border-0 shadow-lg p-3 rounded-4 mb-4 ms-2 bg-white" style="width: 220px; text-align: left;">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success text-white rounded-circle p-2 me-3">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Terverifikasi</h6>
+                                <small class="text-muted">Akurasi 95%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light" id="features">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <span class="text-primary fw-bold text-uppercase">Fitur Unggulan</span>
+                <h2 class="fw-bold mt-2">Mengapa TBC Detect AI?</h2>
+                <p class="text-muted">Teknologi canggih untuk diagnosis yang lebih baik.</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-box h-100">
+                        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                        <h4>Hasil Instan</h4>
+                        <p class="text-muted">Diagnosis keluar dalam hitungan detik. Menghemat waktu tunggu pasien secara signifikan.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box h-100">
+                        <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                        <h4>Deep Learning</h4>
+                        <p class="text-muted">Menggunakan arsitektur MobileNetV2 yang telah dilatih dengan ribuan dataset paru-paru.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-box h-100">
+                        <div class="feature-icon"><i class="fas fa-file-pdf"></i></div>
+                        <h4>Laporan PDF</h4>
+                        <p class="text-muted">Unduh laporan medis resmi lengkap dengan visualisasi Heatmap secara otomatis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" id="about">
+        <div class="container py-5">
+            <div class="row justify-content-center text-center mb-5">
+                <div class="col-lg-8">
+                    <span class="text-primary fw-bold text-uppercase">Tim Pengembang</span>
+                    <h2 class="fw-bold mt-2">Dibalik Layar TBC Detect AI</h2>
+                    
+                    <p class="lead fst-italic mt-3" style="color: #2c3e50;">
+                        "Program ini kami dedikasikan untuk mendukung Indonesia Bebas TBC melalui inovasi teknologi yang bermanfaat bagi masyarakat."
+                    </p>
+                    <p class="text-muted">
+                        Dikembangkan oleh mahasiswa dengan semangat kolaborasi dan inovasi:
+                    </p>
+                </div>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="team-card h-100">
+                        <img src="https://ui-avatars.com/api/?name=Yesa+Anggit&background=0d6efd&color=fff&size=200" 
+                             alt="Yesa Anggit" class="team-img">
+                        <h4 class="fw-bold mb-1">Yesa Anggit Prayugo</h4>
+                        <p class="text-primary small fw-bold">Developer Team</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="team-card h-100">
+                        <img src="https://ui-avatars.com/api/?name=Intan+Komala&background=ff6b6b&color=fff&size=200" 
+                             alt="Intan Komala" class="team-img">
+                        <h4 class="fw-bold mb-1">Intan Komalasari</h4>
+                        <p class="text-primary small fw-bold">Developer Team</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="team-card h-100">
+                        <img src="https://ui-avatars.com/api/?name=Siti+Novia&background=20c997&color=fff&size=200" 
+                             alt="Siti Novia" class="team-img">
+                        <h4 class="fw-bold mb-1">Siti Novia Desi</h4>
+                        <p class="text-primary small fw-bold">Developer Team</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <div class="mb-3">
+                <i class="fas fa-lungs-virus fa-2x text-primary"></i>
+            </div>
+            <p class="mb-0">&copy; 202 TBC Detect AI. Developed for Medical Research.</p>
+            <small class="text-muted">Created with Flask & TensorFlow</small>
+            
+        </div>
+    </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
